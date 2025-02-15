@@ -6,6 +6,7 @@ const logout = () => {
   localStorage.removeItem('token');
   router.push({name: 'login'});
 }
+
 </script>
 
 <template>

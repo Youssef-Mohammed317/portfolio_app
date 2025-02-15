@@ -29,16 +29,23 @@ const router = createRouter({
       name: 'projects',
       component: () => import('../views/projects.vue'),
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('../views/NotFound.vue'),
+    }
   ],
 })
 
-router.beforeEach((to,from)=>{
+router.beforeEach(async (to,from)=>{
   if(to.name == 'login' || to.name == 'register'){
     if(localStorage.getItem('token')){
-      checkUser();
-      return {
-        name : 'dashboard'
-      }
+      await checkUser();
+      setTimeout(() => {
+        return {
+          name : 'dashboard'
+        }
+      }, 1000);
     }
     return true;
   }
@@ -50,7 +57,7 @@ router.beforeEach((to,from)=>{
     }
   }
 
-  checkUser();
+  await checkUser();
 })
 
 const checkUser = async () => {
@@ -59,7 +66,13 @@ const checkUser = async () => {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }  
   }).then((res)=>{
-    console.log(res.data)
+    console.log('roting',res.data)
+    if(res.data.code != null){
+      localStorage.removeItem('token')
+      return {
+        name : 'login'
+      }
+    }
   })
   .catch((error) =>{
     console.log(error);
